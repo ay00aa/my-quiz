@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة كويزلي - موقع الكويزات التفاعلي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen text-slate-800 flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl mx-auto">
+        
+        <!-- ================= WELCOME SCREEN ================= -->
+        <div id="welcome-screen" class="glass-card shadow-2xl rounded-3xl p-8 border border-white/20 animate-fade-in">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-indigo-600 to-pink-500 rounded-2xl text-white text-3xl shadow-lg mb-4">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-pink-600 mb-2">منصة كويزلي التفاعلية</h1>
+                <p class="text-slate-600 text-sm md:text-base">اختبر معلوماتك في مجالات متنوعة وتحدّ نفسك! أدخل اسمك واختر القسم المناسب للبدء.</p>
+            </div>
+
+            <form id="quiz-form" onsubmit="startQuiz(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">اسم المتسابق الكريم</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="username" required placeholder="أدخل اسمك هنا..." 
+                            class="w-full pr-11 pl-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-3">اختر قسم الاختبار</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <label class="category-card cursor-pointer border-2 border-slate-200 rounded-2xl p-4 text-center hover:border-indigo-600 transition flex flex-col items-center justify-center bg-white shadow-sm">
+                            <input type="radio" name="category" value="general" checked class="hidden">
+                            <i class="fa-solid fa-earth-americas text-2xl text-indigo-600 mb-2"></i>
+                            <span class="font-bold text-slate-800">معلومات عامة</span>
+                        </label>
+                        <label class="category-card cursor-pointer border-2 border-slate-200 rounded-2xl p-4 text-center hover:border-indigo-600 transition flex flex-col items-center justify-center bg-white shadow-sm">
+                            <input type="radio" name="category" value="programming" class="hidden">
+                            <i class="fa-solid fa-code text-2xl text-indigo-600 mb-2"></i>
+                            <span class="font-bold text-slate-800">برمجة وتقنية</span>
+                        </label>
+                        <label class="category-card cursor-pointer border-2 border-slate-200 rounded-2xl p-4 text-center hover:border-indigo-600 transition flex flex-col items-center justify-center bg-white shadow-sm">
+                            <input type="radio" name="category" value="science" class="hidden">
+                            <i class="fa-solid fa-flask text-2xl text-indigo-600 mb-2"></i>
+                            <span class="font-bold text-slate-800">علوم وفضاء</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition transform active:scale-95 flex items-center justify-center gap-2 text-lg">
+                    <span>ابدأ التحدي الآن</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ================= QUIZ SCREEN ================= -->
+        <div id="quiz-screen" class="glass-card shadow-2xl rounded-3xl p-6 md:p-8 hidden animate-fade-in border border-white/20">
+            <!-- Header bar -->
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
+                <div>
+                    <span id="category-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full"></span>
+                    <h2 id="display-username" class="text-sm font-semibold text-slate-500 mt-1"></h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1 text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl font-bold text-sm">
+                        <i class="fa-solid fa-clock text-indigo-600"></i>
+                        <span id="timer">15</span>ث
+                    </div>
+                    <div class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl">
+                        السؤال <span id="current-q-num">1</span> من <span id="total-q-num">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question box -->
+            <div class="mb-6">
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-relaxed"></h3>
+            </div>
+
+            <!-- Options list -->
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamically injected options -->
+            </div>
+
+            <!-- Next button footer -->
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" disabled class="px-6 py-3 bg-slate-300 text-slate-600 font-bold rounded-xl cursor-not-allowed transition flex items-center gap-2">
+                    <span>السؤال التالي</span>
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= RESULT SCREEN ================= -->
+        <div id="result-screen" class="glass-card shadow-2xl rounded-3xl p-8 text-center hidden animate-fade-in border border-white/20">
+            <div id="result-icon" class="inline-flex items-center justify-center w-24 h-24 rounded-full text-4xl mb-4 shadow-md">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-1">انتهى الاختبار بنجاح!</h2>
+            <p id="congrats-msg" class="text-lg font-semibold text-indigo-600 mb-6"></p>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8 grid grid-cols-3 gap-4 text-center shadow-inner">
+                <div>
+                    <span class="block text-slate-400 text-xs font-bold mb-1">الدرجة النهائية</span>
+                    <span id="score-percentage" class="text-2xl md:text-3xl font-black text-indigo-600">0%</span>
+                </div>
+                <div>
+                    <span class="block text-slate-400 text-xs font-bold mb-1">الإجابات الصحيحة</span>
+                    <span id="correct-count" class="text-2xl md:text-3xl font-black text-emerald-600">0</span>
+                </div>
+                <div>
+                    <span class="block text-slate-400 text-xs font-bold mb-1">الإجابات الخاطئة</span>
+                    <span id="incorrect-count" class="text-2xl md:text-3xl font-black text-rose-600">0</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="restartQuiz()" class="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>إعادة الاختبار</span>
+                </button>
+                <button onclick="changeCategory()" class="px-6 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span>تغيير القسم</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Database of quiz categories and questions
+        const quizData = {
+            general: {
+                title: "معلومات عامة",
+                questions: [
+                    {
+                        question: "ما هي عاصمة دولة استراليا؟",
+                        options: ["سيدني", "ملبورن", "كانبيرا", "بريزبان"],
+                        answer: 2
+                    },
+                    {
+                        question: "كم عدد المحيطات الرئيسية على سطح الكوكب؟",
+                        options: ["3 محيطات", "4 محيطات", "5 محيطات", "7 محيطات"],
+                        answer: 2
+                    },
+                    {
+                        question: "في أي عاصمة يقع متحف اللوفر الشهير؟",
+                        options: ["لندن", "باريس", "روما", "مدريد"],
+                        answer: 1
+                    },
+                    {
+                        question: "ما هو العنصر الكيميائي الأكثر وفرة في قشرة الأرض؟",
+                        options: ["الحديد", "الأكسجين", "السيليكون", "النيتروجين"],
+                        answer: 1
+                    },
+                    {
+                        question: "من هو القائد المسلم الذي فتح قسطنطينية؟",
+                        options: ["صلاح الدين الأيوبي", "طارق بن زياد", "محمد الفاتح", "قطز"],
+                        answer: 2
+                    }
+                ]
+            },
+            programming: {
+                title: "برمجة وتقنية",
+                questions: [
+                    {
+                        question: "ما هي لغة البرمجة الأساسية المستخدمة لتصميم وهيكلة صفحات الويب؟",
+                        options: ["Python", "HTML", "C++", "Java"],
+                        answer: 1
+                    },
+                    {
+                        question: "ماذا يقصد باختصار CSS في تطوير الويب؟",
+                        options: ["Cascading Style Sheets", "Creative Style System", "Computer System Styling", "Colorful Style Sheets"],
+                        answer: 0
+                    },
+                    {
+                        question: "أي من هذه اللغات تُعد لغة برمجة وليست لغة تنسيق؟",
+                        options: ["HTML", "XML", "Markdown", "JavaScript"],
+                        answer: 3
+                    },
+                    {
+                        question: "ما هو النظام العالمي الأكثر استخداماً لمشاركة ومتابعة إصدارات الأكواد؟",
+                        options: ["Docker", "Git", "Apache", "Linux"],
+                        answer: 1
+                    },
+                    {
+                        question: "ماذا يعني اصطلاح API في هندسة البرمجيات؟",
+                        options: ["Application Programming Interface", "Advanced Program Integration", "Automated Process Indicator", "Application Process Integration"],
+                        answer: 0
+                    }
+                ]
+            },
+            science: {
+                title: "علوم وفضاء",
+                questions: [
+                    {
+                        question: "ما هو الكوكب الأقرب إلى الشمس في المجموعة الشمسية؟",
+                        options: ["الزهرة", "عطارد", "المريخ", "المشتري"],
+                        answer: 1
+                    },
+                    {
+                        question: "كم تستغرق ضوء الشمس ليصل إلى كوكب الأرض تقريباً؟",
+                        options: ["ثانية واحدة", "8 دقائق", "ساعة كاملة", "24 ساعة"],
+                        answer: 1
+                    },
+                    {
+                        question: "ما هو الغاز المسؤول عن ظاهرة الاحتباس الحراري بشكل رئيسي؟",
+                        options: ["الأكسجين", "النيتروجين", "ثاني أكسيد الكربون", "الهيدروجين"],
+                        answer: 2
+                    },
+                    {
+                        question: "ما هي وحدة قياس القوة في النظام الدولي للوحدات؟",
+                        options: ["الجول", "النيوتن", "الواط", "الباسكال"],
+                        answer: 1
+                    },
+                    {
+                        question: "أي جزء من الخلية الحيوانية والنباتية يحتوي على المادة الوراثية (DNA)؟",
+                        options: ["الميتوكوندريا", "الريبوسوم", "النواة", "الغشاء الخلوي"],
+                        answer: 2
+                    }
+                ]
+            }
+        };
+
+        // Application State
+        let currentCategory = 'general';
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let incorrect = 0;
+        let selectedOption = null;
+        let answered = false;
+        let timerInterval = null;
+        let timeLeft = 15;
+        let userName = '';
+
+        // Category selection active UI border highlight styling
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('border-indigo-600', 'bg-indigo-50/50'));
+                card.classList.add('border-indigo-600', 'bg-indigo-50/50');
+                card.querySelector('input').checked = true;
+            });
+        });
+
+        // Initialize first item checked visual state
+        document.querySelector('.category-card').click();
+
+        // Start Quiz flow
+        function startQuiz(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('username').value.trim();
+            if(!nameInput) return;
+            
+            userName = nameInput;
+            const selectedRadio = document.querySelector('input[name="category"]:checked');
+            currentCategory = selectedRadio ? selectedRadio.value : 'general';
+            
+            currentQuestions = quizData[currentCategory].questions;
+            currentIndex = 0;
+            score = 0;
+            incorrect = 0;
+
+            document.getElementById('display-username').textContent = `المتسابق: ${userName}`;
+            document.getElementById('category-badge').textContent = quizData[currentCategory].title;
+            document.getElementById('total-q-num').textContent = currentQuestions.length;
+
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        // Load Question details
+        function loadQuestion() {
+            answered = false;
+            selectedOption = null;
+            timeLeft = 15;
+            document.getElementById('timer').textContent = timeLeft;
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').className = "px-6 py-3 bg-slate-300 text-slate-600 font-bold rounded-xl cursor-not-allowed transition flex items-center gap-2";
+
+            const qObj = currentQuestions[currentIndex];
+            document.getElementById('current-q-num').textContent = currentIndex + 1;
+            document.getElementById('question-text').textContent = qObj.question;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            qObj.options.forEach((optionText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-right p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-500 font-medium text-slate-700 transition flex items-center justify-between shadow-sm group";
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center font-bold text-sm text-slate-500 transition">${String.fromCharCode(1575 + idx)}</span>
+                        <span>${optionText}</span>
+                    </span>
+                    <span class="option-icon text-lg hidden"></span>
+                `;
+                btn.onclick = () => selectAnswer(idx, btn);
+                container.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        // Timer counter
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if(!answered) {
+                        handleTimeOut();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Handle question timeout
+        function handleTimeOut() {
+            answered = true;
+            incorrect++;
+            const qObj = currentQuestions[currentIndex];
+            const buttons = document.getElementById('options-container').children;
+
+            // Highlight correct answer
+            buttons[qObj.answer].className = "w-full text-right p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-900 transition flex items-center justify-between shadow-sm";
+            buttons[qObj.answer].querySelector('.option-icon').innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i>';
+            buttons[qObj.answer].querySelector('.option-icon').classList.remove('hidden');
+
+            disableAllOptions();
+            enableNextButton();
+        }
+
+        // Select an option
+        function selectAnswer(selectedIndex, btnElement) {
+            if(answered) return;
+            answered = true;
+            clearInterval(timerInterval);
+
+            const qObj = currentQuestions[currentIndex];
+            const buttons = document.getElementById('options-container').children;
+
+            if(selectedIndex === qObj.answer) {
+                score++;
+                btnElement.className = "w-full text-right p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-900 transition flex items-center justify-between shadow-sm";
+                btnElement.querySelector('.option-icon').innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i>';
+                btnElement.querySelector('.option-icon').classList.remove('hidden');
+            } else {
+                incorrect++;
+                btnElement.className = "w-full text-right p-4 rounded-2xl border-2 border-rose-500 bg-rose-50 font-bold text-rose-900 transition flex items-center justify-between shadow-sm";
+                btnElement.querySelector('.option-icon').innerHTML = '<i class="fa-solid fa-xmark text-rose-600"></i>';
+                btnElement.querySelector('.option-icon').classList.remove('hidden');
+
+                // Show correct answer too
+                buttons[qObj.answer].className = "w-full text-right p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-900 transition flex items-center justify-between shadow-sm";
+                buttons[qObj.answer].querySelector('.option-icon').innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i>';
+                buttons[qObj.answer].querySelector('.option-icon').classList.remove('hidden');
+            }
+
+            disableAllOptions();
+            enableNextButton();
+        }
+
+        function disableAllOptions() {
+            const buttons = document.getElementById('options-container').children;
+            for(let b of buttons) {
+                b.style.pointerEvents = 'none';
+            }
+        }
+
+        function enableNextButton() {
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition flex items-center gap-2 transform active:scale-95";
+        }
+
+        // Proceed to next question or show results
+        function nextQuestion() {
+            currentIndex++;
+            if(currentIndex < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Display results screen
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const total = currentQuestions.length;
+            const percentage = Math.round((score / total) * 100);
+
+            document.getElementById('score-percentage').textContent = `${percentage}%`;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('incorrect-count').textContent = incorrect;
+
+            const congratsMsg = document.getElementById('congrats-msg');
+            const resultIcon = document.getElementById('result-icon');
+
+            if(percentage === 100) {
+                congratsMsg.textContent = `مذهل يا ${userName}! لقد أجبت على جميع الأسئلة بشكل صحيح تماماً! 🌟`;
+                resultIcon.className = "inline-flex items-center justify-center w-24 h-24 rounded-full text-4xl mb-4 shadow-md bg-amber-100 text-amber-600";
+                resultIcon.innerHTML = '<i class="fa-solid fa-crown"></i>';
+            } else if(percentage >= 60) {
+                congratsMsg.textContent = `أحسنت يا ${userName}! أداء رائع ومعلوماتك ممتازة! 🎉`;
+                resultIcon.className = "inline-flex items-center justify-center w-24 h-24 rounded-full text-4xl mb-4 shadow-md bg-emerald-100 text-emerald-600";
+                resultIcon.innerHTML = '<i class="fa-solid fa-award"></i>';
+            } else {
+                congratsMsg.textContent = `لا بأس يا ${userName}، حاول مرة أخرى لتطوير معلوماتك ورفع مستواك! 💪`;
+                resultIcon.className = "inline-flex items-center justify-center w-24 h-24 rounded-full text-4xl mb-4 shadow-md bg-indigo-100 text-indigo-600";
+                resultIcon.innerHTML = '<i class="fa-solid fa-seedling"></i>';
+            }
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            currentIndex = 0;
+            score = 0;
+            incorrect = 0;
+            loadQuestion();
+        }
+
+        // Change category / return home
+        function changeCategory() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('welcome-screen').classList.remove('hidden');
+            document.getElementById('quiz-form').reset();
+            document.querySelector('.category-card').click();
+        }
+    </script>
+</body>
+</html>
